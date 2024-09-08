@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="de">
+	<head>
+		<meta charset="utf-8">
+		<title>Adventskalender</title>
+
+	  	<!-- Mobile-friendly viewport -->
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <link rel="stylesheet" href="style.css" media="all">
+	</head>
+	<body>
+		<main>
+			<div id="adventOverlay" class="invisible">
+				<div class="wrapper">
+					<span class="xToClose">X</span>
+					<img src="images/background.jpg" />
+				</div>
+			</div>
+			<h1>Adventskalender</h1>
+			<ul id="adventDoors"></ul>
+			<nav><a href="/">Zur Hauptseite</a></nav>
+		</main>
+
+		<script src="cal.min.js"></script>
+	<script>(()=>{
+		main();
+	})();
+	</script>
+	</body>
+</html>

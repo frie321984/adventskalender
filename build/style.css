@@ -1,0 +1,153 @@
+html {
+  box-sizing: border-box;
+  text-rendering: optimizeLegibility;
+}
+*,
+*:before,
+*:after {
+  box-sizing: inherit;
+}
+body {
+  display: flex;
+	justify-content: center;
+  margin: 0;
+  background-color: #333333;
+    color: white;
+  font-family: serif;
+}
+body nav a {
+    color: #d6c6ff;
+    display: inline-block;
+    margin-top: 5px;
+}
+/* Styles for the Advent Calendar */
+#adventDoors li a {
+	color: #fff;
+    text-shadow: 1px 1px rgb(0,0,0,.7);
+	width: 100%;
+	height: 100%;
+	font-size: 24px;
+	text-align: center;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	text-decoration: none;
+	border: 1px #fff dashed;
+    cursor: pointer;
+}
+#adventDoors li a:hover {
+	color: #fff;
+	background-color: rgba(255,255,255,0.2);
+}
+#adventDoors li a.opened {
+    border: 1px solid rgba(255,255,255,.4);
+}
+#adventDoors li.disabled a {
+	border-color: rgba(255,255,255, .5);
+	color: rgba(255,255,255,.5);
+	cursor: default;
+}
+#adventDoors li.disabled a:hover {
+  background-color: transparent;
+}
+
+#overlay {
+	position: absolute;
+  top:0;
+  left:0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 100;
+  display: flex;
+  background-color: rgba(33, 23, 3, 0.7);
+}
+
+#overlay .wrapper {
+  animation: fade-in 0.5s linear both;
+    border: 4px solid rgba(200,200,200,.5);
+    border-radius: 6%;
+}
+#overlay img {
+    display: block;
+    border: 3px solid rgb(33,33,33);
+    border-radius: 5%;
+    max-width: 95vw;
+    max-height: 95vh;
+}
+@keyframes fade-in {
+  0% {
+    transform: scale(0);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+#overlay .wrapper {
+    margin: auto;
+    direction: rtl;
+}
+#overlay.invisible {
+  display: none;
+}
+#overlay .xToClose {
+    position: fixed;
+    padding: 2% 3%;
+    color: rgb(255,255,255,.7);
+    text-shadow: 1px 1px rgb(0,0,0,.8);
+    z-index: 100;
+    font-family: sans-serif;
+    font-size: 24pt;
+    cursor: pointer;
+}
+
+
+#adventDoors {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
+  align-items: stretch;
+  align-content: stretch;
+  background-image: url('/weihnachten/images/background.jpg');
+  width: 450px;
+  height: 600px;
+    max-width: 95vw;
+    max-height: 86vh;
+}
+
+#adventDoors li {
+  position: relative;
+  display: inline-block;
+  flex-grow: 1;
+  flex-basis: 25%;
+  padding: 3%;
+}
+
+/* Fuer kleine Displays */
+@media screen and (max-width: 850px) {
+    h1 {
+        font-size: 1.5em;
+    }
+}
+
+@media (max-height: 400px) {
+    h1 {
+        display: none;
+    }
+    #adventDoors {
+        margin-top:1%;
+        max-height: 350px;
+    }
+}
+
+@media (max-width: 300px) {
+    h1 {
+        display: none;
+    }
+    #adventDoors {
+        max-width: 245px;
+    }
+}

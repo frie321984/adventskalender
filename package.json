@@ -1,0 +1,36 @@
+{
+  "name": "frie321984.adventskalender",
+  "version": "0.0.2",
+  "description": "virtueller Adventskalender",
+  "main": "src/calendar.js",
+  "scripts": {
+    "build": "npx uglify-js -o build/cal.min.js --compress --mangle -- src/calendar.js",
+    "serve": "npx serve build -p 8000",
+    "test": "jest"
+  },
+  "jest": {
+    "testEnvironment": "jsdom"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/frie321984/adventskalender.git"
+  },
+  "keywords": [
+    "advent",
+    "calendar",
+    "xmas",
+    "christmas"
+  ],
+  "author": "Friederike Schertel",
+  "license": "CC BY-NC 4.0",
+  "bugs": {
+    "url": "https://github.com/frie321984/adventskalender/issues"
+  },
+  "homepage": "https://github.com/frie321984/adventskalender#readme",
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
+    "serve": "^14.2.3",
+    "uglify-js": "^3.19.3"
+  }
+}

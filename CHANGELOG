@@ -1,0 +1,20 @@
+
+
+Erledigt
+--------------
+x Overlay-Bild zurücksetzen auf "Wartebildschirm" beim schließen
+x Erlaube Doppelklick auf Türchen
+x pipeline die jeden tag das neue Bild hochlädt
+x bilder raussuchen
+x anker entfernen um "springen" auf der Seite zu verhindern
+x Türöffnen animation
+x zeige minibild, wenn es angeklickt wurde
+x debug flag im browser cache, damit ich Dezmbercheck immer
+  "scharf schalten" kann im web vvv
+x ClickableDoors auf richtigen Monat einstellen
+x Preload Bilder damit sie "gleich da" sind.
+x Rahmen für bilder
+x einfaches Update im nächsten Jahr
+x bildernamen die nicht gleich verraten welches türchen es ist
+x Bilder für 2023 hochladen
+x weniger aufwand in der pipeline
