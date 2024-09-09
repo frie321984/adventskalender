@@ -75,7 +75,7 @@ clickDoor = (clickedDoor)=>{
 	let o = byId(overlay);
 
 	img(o).src=imgPath(clickedDoor)
-	o.classList.remove('invisible')
+	o.classList.remove('hidden')
 
 	arrayConstructor.from(allDoors()).forEach(d => clearEventHandlers(d) )
 
@@ -97,7 +97,7 @@ makeDoorsClickable = () => {
 closeOverlay = (_) => {
 	!DEBUG_FLAG||console.debug('close')
 	let el = byId(overlay);
-	el.classList.add('invisible')
+	el.classList.add('hidden')
 	img(el).src = loadingUrl
 	clearEventHandlers(el)
 	setTimeout(makeDoorsClickable, 200)
