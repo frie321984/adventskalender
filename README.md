@@ -6,6 +6,8 @@ Benutz ihn gerne auch und verlinke ihn.
 
 ## Benutzen
 
+`npm i adventcalendar` 
+
 dist/calendar.js oder dist/cal.min.js einbinden
 
 html-code wie in der example.html einfügen.
