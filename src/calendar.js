@@ -1,4 +1,4 @@
-const DEBUG_FLAG = !!localStorage.getItem('fs.weihnachten.debug');
+const DEBUG_FLAG = !!localStorage.getItem('frie321984.adventskalender.debug');
 if (DEBUG_FLAG) console.log('debugging ist ON')
 
 const once={once:true}
