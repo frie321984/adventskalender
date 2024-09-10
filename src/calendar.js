@@ -143,7 +143,7 @@ setup=()=>{
     setupDevHud()
 }
 
-function main() {
+main = () => {
     setup();
     preload(loadingUrl)
     doc.addEventListener('keydown', (ev) => {

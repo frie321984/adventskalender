@@ -100,3 +100,23 @@ describe('calendar', () => {
         })
     })
 });
+
+describe('usage', () => {
+    it('should create doors for calendar', () => {
+        givenDocumentBody("<div id=\"adventOverlay\" class=\"hidden\">\n" +
+            "<div class=\"wrapper\">\n" +
+            "<span class=\"xToClose\">X</span>\n" +
+            "<img src='loading.jpg' />" +
+            "</div>\n" +
+            "</div>\n" +
+            "<ul id=\"adventDoors\"></ul>\n"
+            );
+        main()
+        expect(document.getElementById('adventDoors').innerHTML).toContain('<li')
+        expect(document.getElementById('adventDoors').innerHTML).toContain('door24')
+        expect(document.getElementById('adventDoors').innerHTML).toContain('door1')
+        // TODO adventOverlay should be hidden
+        // TODO useful errors when html doesnt match expectations
+        // TODO simpler setup
+    })
+})
