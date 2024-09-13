@@ -72,34 +72,53 @@ showMiniImage=(tag)=>{
 }
 
 clickDoor = (clickedDoor)=>{
-	!DEBUG_FLAG||console.debug('click')
-	const tag = day(clickedDoor);
-	!DEBUG_FLAG||console.debug(tag)
-	let o = byId(overlay);
+    !DEBUG_FLAG||console.debug('click')
+    const tag = day(clickedDoor);
+    !DEBUG_FLAG||console.debug(tag)
+    let o = byId(overlay);
 
-	img(o).src=imgPath(clickedDoor)
-	o.classList.remove('hidden')
+    img(o).src=clickedDoor.imgPath
+    o.classList.remove('hidden')
 
-	arrayConstructor.from(allDoors()).forEach(d => clearEventHandlers(d) )
+    arrayConstructor.from(allDoors()).forEach(d => clearEventHandlers(d) )
 
-	showMiniImage(tag);
-	setTimeout(() => makeOverlayCloseable(), 500)
+    showMiniImage(tag);
+    setTimeout(() => makeOverlayCloseable(), 500)
+}
+
+clickDoorFUN = (clickedDoor = {
+    li: undefined,
+    a: undefined,
+    day: 12,
+    id: 'door12',
+    imgPath: 'loading.jpg',
+    clickable: true
+}, o = byId(overlay))=>{
+    !DEBUG_FLAG||console.debug('click')
+    const tag = clickedDoor.day;
+    !DEBUG_FLAG||console.debug(tag)
+
+    img(o).src=clickedDoor.imgPath
+    o.classList.remove('hidden')
+
+    arrayConstructor.from(allDoors()).forEach(d => clearEventHandlers(d) )
+
+    showMiniImage(tag);
+    setTimeout(() => makeOverlayCloseable(), 500)
 }
 
 makeDoorsClickable = () => {
-	arrayConstructor.from(allDoors())
-		.filter(isDoorClickable)
+	arrayConstructor.from(allClickableDoors())
 		.forEach(d => {
-			d.addEventListener('click', () => clickDoor(d), once)
-			d.addEventListener('keydown', (ev) => {
+			d.li.addEventListener('click', () => clickDoorFUN(d), once)
+			d.li.addEventListener('keydown', (ev) => {
 				const k=ev.key.toUpperCase()
 				if ([' ','ENTER'].includes(k)) clickDoor(d)
 			})
 		})
 }
-closeOverlay = (_) => {
+closeOverlay = (_, el = byId(overlay)) => {
 	!DEBUG_FLAG||console.debug('close')
-	let el = byId(overlay);
 	el.classList.add('hidden')
 	img(el).src = loadingUrl
 	clearEventHandlers(el)
@@ -179,4 +198,32 @@ main = () => {
         .filter(isDoorClickable)
         .reverse()
         .forEach(li => preload(imgPath(li)))
+}
+//----------------------
+
+const addClickabilityDependingOnNowAndDEBUG_FLAG = (li = {id: 'door12', a: undefined, day: 12}, now = new Date(), shouldDebug = DEBUG_FLAG) => {
+    const d = li.day;
+    const dbgRule = d <= 24;
+    const defaultRule = now.getMonth() >= 11 && d <= now.getDate()
+    return {...li, clickable: shouldDebug ? dbgRule : defaultRule}
+}
+
+const allDoorsFUN = (doc) => Array.from(doc.querySelectorAll('li'))
+    .map(link => ({li: link, id: link.id, a: link.querySelector('a')}))
+    .map(link => ({ ...link, day: link.a.text }))
+    .map(x => addClickabilityDependingOnNowAndDEBUG_FLAG(x))
+    .map(x => ({...x, imgPath: 'images/' + x.day + ".jpg"}))
+
+const allClickableDoors = (doc = document) => allDoorsFUN(doc)
+    .filter(x => x.clickable)
+
+const preloadAllImages = (doc) => allDoorsFUN(doc)
+        .reverse()
+        .forEach(x => preload(x.imgPath));
+
+mainFun= () => {
+    setup();
+
+    closeOverlay()
+    preloadAllImages(document)
 }
