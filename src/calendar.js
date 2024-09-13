@@ -2,6 +2,7 @@ const DEBUG_FLAG = !!localStorage.getItem('frie321984.adventskalender.debug');
 if (DEBUG_FLAG) console.log('debugging ist ON')
 
 const once={once:true}
+const adventcalendar = 'adventcalendar';
 const adventDoors = 'adventDoors';
 const overlay = "adventOverlay";
 const imagePath = "/weihnachten/images/";
@@ -129,6 +130,21 @@ setupDevHud = () => {
 }
 
 setup=()=>{
+    if (byId(adventcalendar) !== undefined && byId(adventcalendar) !== null) {
+        console.log('create new')
+        console.dir(byId(adventcalendar))
+        const overlayNode = doc.createElement('div')
+        overlayNode.id = overlay;
+        overlayNode.innerHTML = '"<div class=\\"wrapper\\">\\n" +\n' +
+            '            "<span class=\\"xToClose\\">X</span>\\n" +\n' +
+            '            "<img src=\'loading.jpg\' />" +\n' +
+            '            "</div>\n"';
+        const calendarNode = doc.createElement('ul')
+        calendarNode.id = adventDoors
+        byId(adventcalendar).append(overlayNode)
+        byId(adventcalendar).append(calendarNode)
+    }
+
 	img(byId(overlay)).tabIndex=0
     for (let day = 1; day <= 24; day++) {
 		const door = doc.createElement("li");

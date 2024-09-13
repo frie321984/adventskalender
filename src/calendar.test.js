@@ -111,12 +111,25 @@ describe('usage', () => {
             "</div>\n" +
             "<ul id=\"adventDoors\"></ul>\n"
             );
+
         main()
+
         expect(document.getElementById('adventDoors').innerHTML).toContain('<li')
         expect(document.getElementById('adventDoors').innerHTML).toContain('door24')
         expect(document.getElementById('adventDoors').innerHTML).toContain('door1')
-        // TODO adventOverlay should be hidden
-        // TODO useful errors when html doesnt match expectations
-        // TODO simpler setup
+        expect(document.getElementById('adventOverlay').classList).toContain('hidden')
     })
+
+    // TODO useful errors when html doesnt match expectations
+
+    it('simpler setup: should create everything if nothing is there yet', () => {
+        givenDocumentBody("<main id='adventcalendar'></main>");
+
+        main()
+
+        expect(document.getElementsByClassName('xToClode')).toBeTruthy()
+        expect(document.getElementById('adventDoors')).toBeTruthy()
+        expect(document.getElementById('adventOverlay')).toBeTruthy()
+    })
+
 })

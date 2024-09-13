@@ -10,6 +10,6 @@ Benutz ihn gerne auch und verlinke ihn.
 
 dist/calendar.js oder dist/cal.min.js einbinden
 
-html-code wie in der example.html einfügen.
+HTML-Code: `<main id='adventcalendar'></main>` als Platzhalter einfügen.
 
 `main()` Methode aufrufen
