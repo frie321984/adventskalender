@@ -10,7 +10,15 @@ const loadingUrl = imagePath + 'loading.jpg';
 const doc = document;
 const arrayConstructor = Array;
 genDoorId = (day) => day > 0 && day < 32 ? "door" + day : undefined;
-byId = (id) => doc.getElementById(id)
+preload = (url) => {
+    let im = new Image()
+    im.src = url // this starts the preloading in the browser
+    return im // return for testability
+}
+// --------------------
+byId = (id, doc = document) => doc.getElementById(id)
+allDoors = (id = adventDoors, htmlElement = byId(id)) => htmlElement.getElementsByTagName('li')
+// --------------------
 a = (d) => d.getElementsByTagName('a')[0]
 img = (el) => el.getElementsByTagName('img')[0]
 xmasimgs= {
@@ -44,12 +52,6 @@ imgPath = (d) => {
 };
 day = (d) => a(d).text
 clearEventHandlers = (el) => el.outerHTML = el.outerHTML
-preload = (url) => {
-    let im = new Image()
-    im.src = url // this starts the preloading in the browser
-    return im // return for testability
-}
-allDoors = () => byId(adventDoors).getElementsByTagName('li')
 
 isDoorClickable = li => {
 	const now = new Date();

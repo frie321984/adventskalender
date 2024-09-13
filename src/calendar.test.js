@@ -72,8 +72,8 @@ describe('calendar', () => {
 
     describe('allDoors', () => {
         it('valid call', () => {
-            givenDocumentBody("<ul id='adventDoors'><li>1</li><li>2</li><li>3</li><li>4</li></ul>");
-            expect(allDoors().length).toEqual(4)
+            givenDocumentBody("<ul id='foo'><li>1</li><li>2</li><li>3</li><li>4</li></ul>");
+            expect(allDoors('foo').length).toEqual(4)
         })
         it('no list items', () => {
             givenDocumentBody("<ul id='adventDoors'></ul>");
