@@ -217,9 +217,10 @@ const allDoorsFUN = (doc) => Array.from(doc.querySelectorAll('li'))
 const allClickableDoors = (doc = document) => allDoorsFUN(doc)
     .filter(x => x.clickable)
 
-const preloadAllImages = (doc) => allDoorsFUN(doc)
+const preloadAllImages = (doc) => allClickableDoors(doc)
         .reverse()
-        .forEach(x => preload(x.imgPath));
+        .map(x => x.imgPath)
+        .forEach(preload);
 
 mainFun= () => {
     setup();
