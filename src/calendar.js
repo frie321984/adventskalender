@@ -5,8 +5,8 @@ const once={once:true}
 const adventcalendar = 'adventcalendar';
 const adventDoors = 'adventDoors';
 const overlay = "adventOverlay";
-const imagePath = "/weihnachten/images/";
-const loadingUrl = imagePath + '/loading.jpg';
+const imagePath = "images/";
+const loadingUrl = imagePath + 'loading.jpg';
 const doc = document;
 const arrayConstructor = Array;
 genDoorId = (day) => day > 0 && day < 32 ? "door" + day : undefined;
@@ -131,14 +131,9 @@ setupDevHud = () => {
 
 setup=()=>{
     if (byId(adventcalendar) !== undefined && byId(adventcalendar) !== null) {
-        console.log('create new')
-        console.dir(byId(adventcalendar))
         const overlayNode = doc.createElement('div')
         overlayNode.id = overlay;
-        overlayNode.innerHTML = '"<div class=\\"wrapper\\">\\n" +\n' +
-            '            "<span class=\\"xToClose\\">X</span>\\n" +\n' +
-            '            "<img src=\'loading.jpg\' />" +\n' +
-            '            "</div>\n"';
+        overlayNode.innerHTML = '<div class="wrapper"><span class="xToClose">X</span><img src="'+loadingUrl+'" /></div>';
         const calendarNode = doc.createElement('ul')
         calendarNode.id = adventDoors
         byId(adventcalendar).append(overlayNode)

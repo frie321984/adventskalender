@@ -10,8 +10,9 @@
   "scripts": {
     "shrink": "npx uglify-js -o dist/cal.min.js --compress --mangle -- src/calendar.js",
     "build": "mkdir -p dist && cp src/calendar.js dist && npm run shrink && cp build/index.html dist/example.html",
-    "serve": "npx serve build -p 8000",
-    "test": "jest"
+    "serve": "cp src/calendar.js build && npx serve build -p 8000",
+    "test": "jest",
+    "coverage": "jest --collectCoverage"
   },
   "jest": {
     "testEnvironment": "jsdom"
