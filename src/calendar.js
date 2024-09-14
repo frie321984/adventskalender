@@ -108,7 +108,7 @@ clickDoorFUN = (clickedDoor = {
 }
 
 makeDoorsClickable = () => {
-	arrayConstructor.from(allClickableDoors())
+	arrayConstructor.from(allDoorsFUN())
 		.forEach(d => {
 			d.li.addEventListener('click', () => clickDoorFUN(d), once)
 			d.li.addEventListener('keydown', (ev) => {
@@ -208,7 +208,7 @@ const addClickabilityDependingOnNowAndDEBUG_FLAG = (li = {id: 'door12', a: undef
     return {...li, clickable: shouldDebug ? dbgRule : defaultRule}
 }
 
-const allDoorsFUN = (doc) => Array.from(doc.querySelectorAll('li'))
+const allDoorsFUN = (doc = document) => Array.from(doc.querySelectorAll('li'))
     .map(link => ({li: link, id: link.id, a: link.querySelector('a')}))
     .map(link => ({ ...link, day: link.a.text }))
     .map(x => addClickabilityDependingOnNowAndDEBUG_FLAG(x))
@@ -222,9 +222,33 @@ const preloadAllImages = (doc) => allClickableDoors(doc)
         .map(x => x.imgPath)
         .forEach(preload);
 
+const hide = elem => {
+    elem.classList.add('hidden')
+    return elem
+}
+function composeAll(...fns) {
+    return x => fns.reduce(
+        (res, f) => f(res),
+        x
+    );
+}
+const toReject = p => p.then(x => Promise.reject(x));
+const toSuccess = p => p.catch(x => x);
+const tap = fn => p => p.then(x => { fn(x); return x; });
+const map = fn => p => p.then(x => { return fn(x); });
 mainFun= () => {
     setup();
 
-    closeOverlay()
+    byId(overlay).addEventListener('click', (_) => {
+        composeAll(
+            tap(console.log),
+            tap(hide),
+            map((el) => {return {element: el, img: el.getElementsByTagName('img')[0]}}),
+            tap((x) => {x.img.src = loadingUrl}), // STATE CHANGE
+            tap((x) => clearEventHandlers(x.element)), // STATE CHANGE
+            tap(x => setTimeout(makeDoorsClickable, 200)), // STATE CHANGE
+            tap(console.log),
+        )(Promise.resolve(byId(overlay)))
+    })
     preloadAllImages(document)
 }
