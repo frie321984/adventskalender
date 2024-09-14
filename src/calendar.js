@@ -300,6 +300,7 @@ mainFun= (imgUrlFn = (day) => 'images/'+day+'.jpg') => {
             tap((x) => {x.img.src = loadingUrl}), // STATE CHANGE
             tap(x => show(x.element)), // STATE CHANGE
             tap((x) => {x.img.src = x.imgUrl}), // STATE CHANGE
+            // TODO showMiniImage
             onError(day => pubsub.pub('error', day)),
         )(Promise.resolve(byId(overlay)))
     })
