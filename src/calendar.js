@@ -118,6 +118,7 @@ makeDoorsClickable = () => {
 			})
 		})
 }
+const EVENT_CLOSE = 'close';
 closeOverlay = (_, el = byId(overlay)) => {
 	!DEBUG_FLAG||console.debug('close')
 	el.classList.add('hidden')
@@ -262,6 +263,8 @@ closeOverlayFUN = (overlayElement = byId(overlay))=> {
     )(Promise.resolve(overlayElement))
 }
 
+const EVENT_OPEN_DOOR = 'openDoor';
+const EVENT_ERROR = 'error';
 mainFun= (imgUrlFn = (day) => 'images/'+day+'.jpg') => {
     const pubsub = createPubSub()
     setup((pos) => {
@@ -272,10 +275,10 @@ mainFun= (imgUrlFn = (day) => 'images/'+day+'.jpg') => {
 
     document.addEventListener('keydown', (ev) => {
         if (ev.key.toUpperCase()==="ESCAPE")
-            pubsub.pub('close')
+            pubsub.pub(EVENT_CLOSE)
     })
 
-    byId(overlay).addEventListener('click', _ => pubsub.pub('close'))
+    byId(overlay).addEventListener('click', _ => pubsub.pub(EVENT_CLOSE))
 
     const showMiniImageFUN = (x) => {
         const link = x.a
@@ -293,23 +296,23 @@ mainFun= (imgUrlFn = (day) => 'images/'+day+'.jpg') => {
         }),
         tap(showMiniImageFUN),
         map(door => door.day),
-        tap(day => pubsub.pub('openDoor', day)),
-        onError(day => pubsub.pub('error', day)),
+        tap(day => pubsub.pub(EVENT_OPEN_DOOR, day)),
+        onError(day => pubsub.pub(EVENT_ERROR, day)),
     )(Promise.resolve(door))
 
-    pubsub.sub('error', console.error)
+    pubsub.sub(EVENT_ERROR, console.error)
 
-    pubsub.sub('openDoor', day => {
+    pubsub.sub(EVENT_OPEN_DOOR, day => {
         composeAll(
             map((el) => {return {element: el, img: el.getElementsByTagName('img')[0], imgUrl: imgUrlFn(day)}}),
             tap((x) => {x.img.src = loadingUrl}), // STATE CHANGE
             tap(x => show(x.element)), // STATE CHANGE
             tap((x) => {x.img.src = x.imgUrl}), // STATE CHANGE
-            onError(day => pubsub.pub('error', day)),
+            onError(day => pubsub.pub(EVENT_ERROR, day)),
         )(Promise.resolve(byId(overlay)))
     })
 
-    pubsub.sub('close', closeOverlayFUN)
+    pubsub.sub(EVENT_CLOSE, closeOverlayFUN)
 
     allDoorsFUN().forEach(door => {
         door.a.disabled = !door.clickable;
