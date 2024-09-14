@@ -155,6 +155,7 @@ setup=(orderOfDoor = (position => position))=>{
     if (byId(adventcalendar) !== undefined && byId(adventcalendar) !== null) {
         const overlayNode = doc.createElement('div')
         overlayNode.id = overlay;
+        overlayNode.classList.add('hidden')
         overlayNode.innerHTML = '<div class="wrapper"><span class="xToClose">X</span><img src="'+loadingUrl+'" /></div>';
         const calendarNode = doc.createElement('ul')
         calendarNode.id = adventDoors
@@ -177,8 +178,8 @@ setup=(orderOfDoor = (position => position))=>{
 }
 
 main = () => {
-    setup();
     preload(loadingUrl)
+    setup();
     doc.addEventListener('keydown', (ev) => {
         if (ev.key.toUpperCase()==="ESCAPE")
             closeOverlay()
