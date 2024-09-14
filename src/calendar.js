@@ -1,158 +1,23 @@
 const DEBUG_FLAG = !!localStorage.getItem('frie321984.adventskalender.debug');
 if (DEBUG_FLAG) console.log('debugging ist ON')
-console.log(DEBUG_FLAG)
 
-const once={once:true}
 const adventcalendar = 'adventcalendar';
 const adventDoors = 'adventDoors';
 const overlay = "adventOverlay";
-const imagePath = "images/";
-const loadingUrl = imagePath + 'loading.jpg';
-const doc = document;
-const arrayConstructor = Array;
+const EVENT_OPEN_DOOR = 'openDoor';
+const EVENT_ERROR = 'error';
+const EVENT_CLOSE = 'close';
+
 genDoorId = (day) => day > 0 && day < 32 ? "door" + day : undefined;
 preload = (url) => {
     let im = new Image()
     im.src = url // this starts the preloading in the browser
     return im // return for testability
 }
-// --------------------
 byId = (id, doc = document) => doc.getElementById(id)
-allDoors = (id = adventDoors, htmlElement = byId(id)) => htmlElement.getElementsByTagName('li')
-// --------------------
 a = (d) => d.getElementsByTagName('button')[0]
 img = (el) => el.getElementsByTagName('img')[0]
-xmasimgs= {
-    1: '1.jpg',
-    2: '2.jpg',
-    3: '3.jpg',
-    4: '4.jpg',
-    5: '5.jpg',
-    6: '6.jpg',
-    7: '7.jpg',
-    8: '8.jpg',
-    9: '9.jpg',
-    10: '10.jpg',
-    11: '11.jpg',
-    12: '12.jpg',
-    13: '13.jpg',
-    14: '14.jpg',
-    15: '15.jpg',
-    16: '16.jpg',
-    17: '17.jpg',
-    18: '18.jpg',
-    19: '23.jpg',
-    20: '19.jpg',
-    21: '20.jpg',
-    22: '21.jpg',
-    23: '22.jpg',
-    24: '24.jpg'
-}
-imgPath = (d) => {
-    return imagePath + xmasimgs[day(d)];
-};
-day = (d) => a(d).text
-clearEventHandlers = (el) => el.outerHTML = el.outerHTML
-
-isDoorClickable = li => {
-	const now = new Date();
-	const d = day(li);
-	const dbgRule = d <= 24;
-	const defaultRule = now.getMonth() >= 11 && d <= now.getDate()
-	return DEBUG_FLAG?dbgRule:defaultRule
-}
-
-showMiniImage=(tag)=>{
-	const door = byId(genDoorId(tag))
-	const link = a(door)
-	link.classList.add('opened')
-	setTimeout(
-		() => link.style = "background-image: url('" + imgPath(door) + "'); background-size:cover;",
-		500
-	)
-}
-
-clickDoor = (clickedDoor)=>{
-    !DEBUG_FLAG||console.debug('click')
-    const tag = day(clickedDoor);
-    !DEBUG_FLAG||console.debug(tag)
-    let o = byId(overlay);
-
-    img(o).src=clickedDoor.imgPath
-    o.classList.remove('hidden')
-
-    arrayConstructor.from(allDoors()).forEach(d => clearEventHandlers(d) )
-
-    showMiniImage(tag);
-    setTimeout(() => makeOverlayCloseable(), 500)
-}
-
-clickDoorFUN = (clickedDoor = {
-    li: undefined,
-    a: undefined,
-    day: 12,
-    id: 'door12',
-    imgPath: 'loading.jpg',
-    clickable: true
-}, o = byId(overlay))=>{
-    !DEBUG_FLAG||console.debug('click')
-    const tag = clickedDoor.day;
-    !DEBUG_FLAG||console.debug(tag)
-
-    img(o).src=clickedDoor.imgPath
-    o.classList.remove('hidden')
-
-    arrayConstructor.from(allDoors()).forEach(d => clearEventHandlers(d) )
-
-    showMiniImage(tag);
-    setTimeout(() => makeOverlayCloseable(), 500)
-}
-
-makeDoorsClickable = () => {
-	arrayConstructor.from(allDoorsFUN())
-		.forEach(d => {
-			d.li.addEventListener('click', () => clickDoorFUN(d), once)
-			d.li.addEventListener('keydown', (ev) => {
-				const k=ev.key.toUpperCase()
-				if ([' ','ENTER'].includes(k)) clickDoor(d)
-			})
-		})
-}
-const EVENT_CLOSE = 'close';
-closeOverlay = (_, el = byId(overlay)) => {
-	!DEBUG_FLAG||console.debug('close')
-	el.classList.add('hidden')
-	img(el).src = loadingUrl
-	clearEventHandlers(el)
-	setTimeout(makeDoorsClickable, 200)
-}
-
-makeOverlayCloseable = () => {
-	byId(overlay).addEventListener('click', closeOverlay, once)
-	byId(overlay).addEventListener('pointerdown', closeOverlay, once)
-	img(byId(overlay)).addEventListener('keydown', (ev) => {
-		if ([' ', 'ENTER', 'X'].includes(ev.key.toUpperCase())) closeOverlay()
-	})
-}
-openAllDoors = () => !DEBUG_FLAG || arrayConstructor.from(allDoors())
-    .filter(isDoorClickable)
-    .forEach(li => showMiniImage(day(li)))
-
-setupDevHud = () => {
-    if (!DEBUG_FLAG) return;
-    if (!byId("dev")) return;
-
-    const openAllLink = doc.createElement("button")
-    openAllLink.textContent = "Open all"
-    openAllLink.addEventListener('click', () => openAllDoors(), once)
-    openAllLink.addEventListener('keydown', (ev) => {
-        const k = ev.key.toUpperCase()
-        if ([' ', 'ENTER'].includes(k)) openAllDoors()
-    })
-    byId("dev").appendChild(openAllLink)
-}
-
-setup=(orderOfDoor = (position => position))=>{
+setup=(loadingUrl, orderOfDoor = (position => position), doc=document)=>{
     if (byId(adventcalendar) !== undefined && byId(adventcalendar) !== null) {
         const overlayNode = doc.createElement('div')
         overlayNode.id = overlay;
@@ -178,35 +43,9 @@ setup=(orderOfDoor = (position => position))=>{
 	}
 }
 
-main = () => {
-    preload(loadingUrl)
-    setup();
-    doc.addEventListener('keydown', (ev) => {
-        if (ev.key.toUpperCase()==="ESCAPE")
-            closeOverlay()
-    })
-    closeOverlay()
-
-    arrayConstructor.from(allDoors())
-        .filter(d => !isDoorClickable(d))
-        .forEach(d => {
-            a(d).tabIndex=-1
-            d.classList.add('disabled')
-        })
-
-    makeDoorsClickable()
-
-    // preloading
-    arrayConstructor.from(allDoors())
-        .filter(isDoorClickable)
-        .reverse()
-        .forEach(li => preload(imgPath(li)))
-}
-//----------------------
-
 const addClickabilityDependingOnNowAndDEBUG_FLAG = (li = {id: 'door12', a: undefined, day: 12}, now = new Date(), shouldDebug = DEBUG_FLAG) => {
     const d = li.day;
-    const dbgRule = d <= now.getDate();
+    const dbgRule = d <= 24;
     const defaultRule = now.getMonth() >= 11 && d <= now.getDate()
     return {...li, clickable: shouldDebug ? dbgRule : defaultRule}
 }
@@ -244,7 +83,7 @@ const map = fn => p => p.then(x => { return fn(x); });
 const onError = fn => p => p.catch(fn)
 const noop = () => {}
 
-closeOverlayFUN = (overlayElement = byId(overlay))=> {
+closeOverlayFUN = loadingUrl => (overlayElement = byId(overlay))=> {
     composeAll(
         map(x => {
             if (x.classList.contains('hidden')) {return Promise.reject('already hidden')}
@@ -263,15 +102,13 @@ closeOverlayFUN = (overlayElement = byId(overlay))=> {
     )(Promise.resolve(overlayElement))
 }
 
-const EVENT_OPEN_DOOR = 'openDoor';
-const EVENT_ERROR = 'error';
-mainFun= (imgUrlFn = (day) => 'images/'+day+'.jpg') => {
+main= (
+    loadingUrl = 'images/loading.jpg',
+    imgUrlFn = (day) => 'images/'+day+'.jpg',
+    doorOrder = (pos) => [12, 3, 19, 8, 23, 6, 15, 1, 17, 24, 10, 4, 20, 14, 7, 22, 9, 2, 11, 18, 21, 5, 13, 16][pos-1]
+) => {
     const pubsub = createPubSub()
-    setup((pos) => {
-        const randomArray = [12, 3, 19, 8, 23, 6, 15, 1, 17, 24, 10, 4, 20, 14, 7, 22, 9, 2, 11, 18, 21, 5, 13, 16];
-        console.log(randomArray, randomArray[pos-1])
-        return randomArray[pos-1]
-    });
+    setup(loadingUrl, doorOrder);
 
     document.addEventListener('keydown', (ev) => {
         if (ev.key.toUpperCase()==="ESCAPE")
@@ -312,7 +149,7 @@ mainFun= (imgUrlFn = (day) => 'images/'+day+'.jpg') => {
         )(Promise.resolve(byId(overlay)))
     })
 
-    pubsub.sub(EVENT_CLOSE, closeOverlayFUN)
+    pubsub.sub(EVENT_CLOSE, closeOverlayFUN(loadingUrl))
 
     allDoorsFUN().forEach(door => {
         door.a.disabled = !door.clickable;

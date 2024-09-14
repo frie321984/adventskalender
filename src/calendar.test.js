@@ -35,7 +35,7 @@ describe('calendar', () => {
 
     describe('a link', () => {
         it('should get first link in an element', () => {
-            const htmlElement = givenSampleHtml("<div><a>1</a><a>2</a></div>");
+            const htmlElement = givenSampleHtml("<div><button>1</button><button>2</button></div>");
             expect(a(htmlElement)).toBeTruthy()
             expect(a(htmlElement).innerHTML).toEqual("1")
         })
@@ -63,36 +63,6 @@ describe('calendar', () => {
         })
     })
 
-    describe('day', () => {
-        it('how to find out day of an element', () => {
-            const htmlElement = givenSampleHtml("<div><a>this-is-the-day</a></div>");
-            expect(day(htmlElement)).toEqual("this-is-the-day")
-        })
-    })
-
-    describe('allDoors', () => {
-        it('valid call', () => {
-            givenDocumentBody("<ul id='foo'><li>1</li><li>2</li><li>3</li><li>4</li></ul>");
-            expect(allDoors('foo').length).toEqual(4)
-        })
-        it('no list items', () => {
-            givenDocumentBody("<ul id='adventDoors'></ul>");
-            expect(allDoors().length).toEqual(0)
-        })
-        it('id not found', () => {
-            givenDocumentBody("<ul id='someOtherId'><li>1</li></ul>");
-            expect(()=>allDoors()).toThrow()
-        })
-    })
-
-    describe('clearEventHandlers', () => {
-        it('valid call', () => {
-            let element = givenSampleHtml('')
-            element.outerHTML = '<button></button>'
-            clearEventHandlers(element)
-            expect(element.outerHTML).toEqual("<button></button>")
-        })
-    })
     describe('preload', () => {
         it('valid call', () => {
             expect(preload('foo')).toBeTruthy()
