@@ -174,7 +174,6 @@ setup=(orderOfDoor = (position => position))=>{
 		link.tabIndex=0
 		door.appendChild(link);
 	}
-    // setupDevHud()
 }
 
 main = () => {
@@ -241,6 +240,27 @@ function composeAll(...fns) {
 const tap = fn => p => p.then(x => { fn(x); return x; });
 const map = fn => p => p.then(x => { return fn(x); });
 const onError = fn => p => p.catch(fn)
+const noop = () => {}
+
+closeOverlayFUN = (overlayElement = byId(overlay))=> {
+    composeAll(
+        map(x => {
+            if (x.classList.contains('hidden')) {return Promise.reject('already hidden')}
+            return  Promise.resolve(x)
+        }),
+        tap(_ => console.log('hiding')),
+        tap(hide),
+        map((el) => {
+            return {element: el, img: el.getElementsByTagName('img')[0]}
+        }),
+        tap((x) => {
+            x.img.src = loadingUrl
+        }), // STATE CHANGE
+        tap(console.log),
+        onError(noop)
+    )(Promise.resolve(overlayElement))
+}
+
 mainFun= (imgUrlFn = (day) => 'images/'+day+'.jpg') => {
     const pubsub = createPubSub()
     setup((pos) => {
@@ -249,17 +269,12 @@ mainFun= (imgUrlFn = (day) => 'images/'+day+'.jpg') => {
         return randomArray[pos-1]
     });
 
-    byId(overlay).addEventListener('click', (_) => {
-        composeAll(
-            tap(console.log),
-            tap(hide),
-            map((el) => {return {element: el, img: el.getElementsByTagName('img')[0]}}),
-            tap((x) => {x.img.src = loadingUrl}), // STATE CHANGE
-            tap(x => pubsub.pub('close', x)),
-            tap(console.log),
-            onError(console.error)
-        )(Promise.resolve(byId(overlay)))
+    document.addEventListener('keydown', (ev) => {
+        if (ev.key.toUpperCase()==="ESCAPE")
+            pubsub.pub('close')
     })
+
+    byId(overlay).addEventListener('click', _ => pubsub.pub('close'))
 
     const doorIsClciked = (door) => composeAll(
         tap(console.log),
@@ -288,6 +303,8 @@ mainFun= (imgUrlFn = (day) => 'images/'+day+'.jpg') => {
             onError(day => pubsub.pub('error', day)),
         )(Promise.resolve(byId(overlay)))
     })
+
+    pubsub.sub('close', closeOverlayFUN)
 
     allDoorsFUN().forEach(door => {
         door.a.disabled = !door.clickable;
