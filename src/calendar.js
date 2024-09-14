@@ -276,12 +276,21 @@ mainFun= (imgUrlFn = (day) => 'images/'+day+'.jpg') => {
 
     byId(overlay).addEventListener('click', _ => pubsub.pub('close'))
 
+    const showMiniImageFUN = (x) => {
+        const link = x.a
+        link.classList.add('opened')
+        setTimeout(
+            () => link.style = "background-image: url('" + imgUrlFn(x.day) + "'); background-size:cover; background-position: center;",
+            500
+        )
+    }
     const doorIsClciked = (door) => composeAll(
         tap(console.log),
         map(door => {
             if (door.clickable) return Promise.resolve(door)
             return Promise.reject(door.day + ' not clickable!')
         }),
+        tap(showMiniImageFUN),
         map(door => door.day),
         tap(day => pubsub.pub('openDoor', day)),
         onError(day => pubsub.pub('error', day)),
@@ -300,7 +309,6 @@ mainFun= (imgUrlFn = (day) => 'images/'+day+'.jpg') => {
             tap((x) => {x.img.src = loadingUrl}), // STATE CHANGE
             tap(x => show(x.element)), // STATE CHANGE
             tap((x) => {x.img.src = x.imgUrl}), // STATE CHANGE
-            // TODO showMiniImage
             onError(day => pubsub.pub('error', day)),
         )(Promise.resolve(byId(overlay)))
     })
