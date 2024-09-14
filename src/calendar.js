@@ -217,13 +217,17 @@ const allDoorsFUN = (doc = document) => Array.from(doc.querySelectorAll('li'))
 const allClickableDoors = (doc = document) => allDoorsFUN(doc)
     .filter(x => x.clickable)
 
-const preloadAllImages = (doc) => allClickableDoors(doc)
+const preloadAllImages = (doc = document) => allClickableDoors(doc)
         .reverse()
         .map(x => x.imgPath)
         .forEach(preload);
 
 const hide = elem => {
     elem.classList.add('hidden')
+    return elem
+}
+const show = elem => {
+    elem.classList.remove('hidden')
     return elem
 }
 function composeAll(...fns) {
@@ -236,7 +240,9 @@ const toReject = p => p.then(x => Promise.reject(x));
 const toSuccess = p => p.catch(x => x);
 const tap = fn => p => p.then(x => { fn(x); return x; });
 const map = fn => p => p.then(x => { return fn(x); });
+const onError = fn => p => p.catch(fn)
 mainFun= () => {
+    const pubsub = createPubSub()
     setup();
 
     byId(overlay).addEventListener('click', (_) => {
@@ -245,10 +251,57 @@ mainFun= () => {
             tap(hide),
             map((el) => {return {element: el, img: el.getElementsByTagName('img')[0]}}),
             tap((x) => {x.img.src = loadingUrl}), // STATE CHANGE
-            tap((x) => clearEventHandlers(x.element)), // STATE CHANGE
-            tap(x => setTimeout(makeDoorsClickable, 200)), // STATE CHANGE
+            tap(x => pubsub.pub('close', x)),
             tap(console.log),
+            onError(console.error)
         )(Promise.resolve(byId(overlay)))
     })
+
+    const doorIsClciked = (door) => composeAll(
+        tap(console.log),
+        map(door => {
+            if (door.day < 12) return Promise.resolve(door) // TODO rando decision. door.clickable is not working yet.
+            return Promise.reject(door.day + ' not clickable!')
+        }),
+        map(door => door.day),
+        tap(day => pubsub.pub('openDoor', day)),
+        onError(console.warn),
+    )(Promise.resolve(door))
+
+    pubsub.sub('openDoor', day => {
+        composeAll(
+            map((el) => {return {element: el, img: el.getElementsByTagName('img')[0]}}),
+            tap((x) => {x.img.src = loadingUrl}), // STATE CHANGE
+            tap(x => show(x.element)),
+            tap((x) => {x.img.src = 'images/'+day+'.jpg'}), // STATE CHANGE
+            tap(console.log),
+            onError(console.error)
+        )(Promise.resolve(byId(overlay)))
+    })
+
+    allDoorsFUN().forEach(door => {
+        door.li.addEventListener('click', event => doorIsClciked(door))
+        door.li.addEventListener('keydown', (ev) => {
+            if ([' ','ENTER'].includes(ev.key.toUpperCase())) doorIsClciked(door)
+        })
+    })
+
     preloadAllImages(document)
 }
+
+const createPubSub = () => {
+    let subscribers = {};
+
+    const subscribe = (eventName, fn) => {
+        subscribers = {
+            ...subscribers,
+            [eventName]: [...(subscribers[eventName] || []), fn]
+        };
+    };
+
+    const publish = (eventName, data) => {
+        (subscribers[eventName] || []).forEach(fn => fn(data));
+    };
+
+    return { sub: subscribe, pub: publish };
+};
