@@ -1,5 +1,6 @@
 const DEBUG_FLAG = !!localStorage.getItem('frie321984.adventskalender.debug');
 if (DEBUG_FLAG) console.log('debugging ist ON')
+console.log(DEBUG_FLAG)
 
 const once={once:true}
 const adventcalendar = 'adventcalendar';
@@ -19,7 +20,7 @@ preload = (url) => {
 byId = (id, doc = document) => doc.getElementById(id)
 allDoors = (id = adventDoors, htmlElement = byId(id)) => htmlElement.getElementsByTagName('li')
 // --------------------
-a = (d) => d.getElementsByTagName('a')[0]
+a = (d) => d.getElementsByTagName('button')[0]
 img = (el) => el.getElementsByTagName('img')[0]
 xmasimgs= {
     1: '1.jpg',
@@ -167,12 +168,12 @@ setup=()=>{
 		byId(adventDoors).appendChild(door);
 		door.id = genDoorId(day);
 
-		const link = doc.createElement("a");
+		const link = doc.createElement("button");
 		link.innerHTML += day;
 		link.tabIndex=0
 		door.appendChild(link);
 	}
-    setupDevHud()
+    //setupDevHud()
 }
 
 main = () => {
@@ -203,14 +204,14 @@ main = () => {
 
 const addClickabilityDependingOnNowAndDEBUG_FLAG = (li = {id: 'door12', a: undefined, day: 12}, now = new Date(), shouldDebug = DEBUG_FLAG) => {
     const d = li.day;
-    const dbgRule = d <= 24;
+    const dbgRule = d <= now.getDate();
     const defaultRule = now.getMonth() >= 11 && d <= now.getDate()
     return {...li, clickable: shouldDebug ? dbgRule : defaultRule}
 }
 
 const allDoorsFUN = (doc = document) => Array.from(doc.querySelectorAll('li'))
-    .map(link => ({li: link, id: link.id, a: link.querySelector('a')}))
-    .map(link => ({ ...link, day: link.a.text }))
+    .map(link => ({li: link, id: link.id, a: link.querySelector('button')}))
+    .map(link => ({ ...link, day: link.a.innerText }))
     .map(x => addClickabilityDependingOnNowAndDEBUG_FLAG(x))
     .map(x => ({...x, imgPath: 'images/' + x.day + ".jpg"}))
 
@@ -236,12 +237,10 @@ function composeAll(...fns) {
         x
     );
 }
-const toReject = p => p.then(x => Promise.reject(x));
-const toSuccess = p => p.catch(x => x);
 const tap = fn => p => p.then(x => { fn(x); return x; });
 const map = fn => p => p.then(x => { return fn(x); });
 const onError = fn => p => p.catch(fn)
-mainFun= () => {
+mainFun= (imgUrlFn = (day) => 'images/'+day+'.jpg') => {
     const pubsub = createPubSub()
     setup();
 
@@ -260,26 +259,37 @@ mainFun= () => {
     const doorIsClciked = (door) => composeAll(
         tap(console.log),
         map(door => {
-            if (door.day < 12) return Promise.resolve(door) // TODO rando decision. door.clickable is not working yet.
+            if (door.clickable) return Promise.resolve(door)
             return Promise.reject(door.day + ' not clickable!')
         }),
         map(door => door.day),
         tap(day => pubsub.pub('openDoor', day)),
-        onError(console.warn),
+        onError(day => pubsub.pub('error', day)),
     )(Promise.resolve(door))
+
+    pubsub.sub('error',             day => {
+        const p = document.createElement('p')
+        p.innerText = 'ERROR ' + day
+        console.error(p.innerText)
+        byId(adventcalendar).appendChild(p)
+    })
 
     pubsub.sub('openDoor', day => {
         composeAll(
-            map((el) => {return {element: el, img: el.getElementsByTagName('img')[0]}}),
+            map((el) => {return {element: el, img: el.getElementsByTagName('img')[0], imgUrl: imgUrlFn(day)}}),
             tap((x) => {x.img.src = loadingUrl}), // STATE CHANGE
-            tap(x => show(x.element)),
-            tap((x) => {x.img.src = 'images/'+day+'.jpg'}), // STATE CHANGE
-            tap(console.log),
-            onError(console.error)
+            tap(x => show(x.element)), // STATE CHANGE
+            tap((x) => {x.img.src = x.imgUrl}), // STATE CHANGE
+            onError(day => pubsub.pub('error', day)),
         )(Promise.resolve(byId(overlay)))
     })
 
     allDoorsFUN().forEach(door => {
+        door.a.disabled = true;
+    })
+
+    allClickableDoors().forEach(door => {
+        door.a.disabled = false;
         door.li.addEventListener('click', event => doorIsClciked(door))
         door.li.addEventListener('keydown', (ev) => {
             if ([' ','ENTER'].includes(ev.key.toUpperCase())) doorIsClciked(door)
