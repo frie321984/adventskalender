@@ -297,12 +297,7 @@ mainFun= (imgUrlFn = (day) => 'images/'+day+'.jpg') => {
         onError(day => pubsub.pub('error', day)),
     )(Promise.resolve(door))
 
-    pubsub.sub('error',             day => {
-        const p = document.createElement('p')
-        p.innerText = 'ERROR ' + day
-        console.error(p.innerText)
-        byId(adventcalendar).appendChild(p)
-    })
+    pubsub.sub('error', console.error)
 
     pubsub.sub('openDoor', day => {
         composeAll(
