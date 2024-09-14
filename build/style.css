@@ -40,12 +40,13 @@ body nav a {
 #adventDoors li a.opened, #adventDoors li button.opened {
     border: 1px solid rgba(255,255,255,.4);
 }
-#adventDoors li.disabled a, #adventDoors li button.disabled {
+#adventDoors li.disabled a, #adventDoors li.disabled button {
 	border-color: rgba(255,255,255, .5);
 	color: rgba(255,255,255,.5);
+    background-color: rgba(255,255,255,0.2);
 	cursor: default;
 }
-#adventDoors li.disabled a:hover , #adventDoors li button.disabled:hover{
+#adventDoors li.disabled a:hover , #adventDoors li.disabled:hover{
   background-color: transparent;
 }
 

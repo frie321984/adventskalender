@@ -151,7 +151,7 @@ setupDevHud = () => {
     byId("dev").appendChild(openAllLink)
 }
 
-setup=()=>{
+setup=(orderOfDoor = (position => position))=>{
     if (byId(adventcalendar) !== undefined && byId(adventcalendar) !== null) {
         const overlayNode = doc.createElement('div')
         overlayNode.id = overlay;
@@ -163,7 +163,8 @@ setup=()=>{
     }
 
 	img(byId(overlay)).tabIndex=0
-    for (let day = 1; day <= 24; day++) {
+    for (let position = 1; position <= 24; position++) {
+        const day = orderOfDoor(position)
 		const door = doc.createElement("li");
 		byId(adventDoors).appendChild(door);
 		door.id = genDoorId(day);
@@ -173,7 +174,7 @@ setup=()=>{
 		link.tabIndex=0
 		door.appendChild(link);
 	}
-    //setupDevHud()
+    // setupDevHud()
 }
 
 main = () => {
@@ -242,7 +243,11 @@ const map = fn => p => p.then(x => { return fn(x); });
 const onError = fn => p => p.catch(fn)
 mainFun= (imgUrlFn = (day) => 'images/'+day+'.jpg') => {
     const pubsub = createPubSub()
-    setup();
+    setup((pos) => {
+        const randomArray = [12, 3, 19, 8, 23, 6, 15, 1, 17, 24, 10, 4, 20, 14, 7, 22, 9, 2, 11, 18, 21, 5, 13, 16];
+        console.log(randomArray, randomArray[pos-1])
+        return randomArray[pos-1]
+    });
 
     byId(overlay).addEventListener('click', (_) => {
         composeAll(
@@ -285,11 +290,11 @@ mainFun= (imgUrlFn = (day) => 'images/'+day+'.jpg') => {
     })
 
     allDoorsFUN().forEach(door => {
-        door.a.disabled = true;
+        door.a.disabled = !door.clickable;
+        if (!door.clickable) door.li.classList.add('disabled')
     })
 
     allClickableDoors().forEach(door => {
-        door.a.disabled = false;
         door.li.addEventListener('click', event => doorIsClciked(door))
         door.li.addEventListener('keydown', (ev) => {
             if ([' ','ENTER'].includes(ev.key.toUpperCase())) doorIsClciked(door)
