@@ -1,6 +1,6 @@
 {
   "name": "adventcalendar",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "virtueller Adventskalender",
   "main": "dist/calendar.js",
   "files": [
