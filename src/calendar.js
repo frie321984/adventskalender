@@ -8,6 +8,8 @@ const EVENT_OPEN_DOOR = 'openDoor';
 const EVENT_ERROR = 'error';
 const EVENT_CLOSE = 'close';
 
+const defaultImgPathFn = (day) => 'images/' + day + ".jpg"
+
 genDoorId = (day) => day > 0 && day < 32 ? "door" + day : undefined;
 preload = (url) => {
     let im = new Image()
@@ -50,19 +52,14 @@ const addClickabilityDependingOnNowAndDEBUG_FLAG = (li = {id: 'door12', a: undef
     return {...li, clickable: shouldDebug ? dbgRule : defaultRule}
 }
 
-const allDoorsFUN = (doc = document) => Array.from(doc.querySelectorAll('li'))
+const allDoorsFUN = (doc = document, imgUrlFn = defaultImgPathFn) => Array.from(doc.querySelectorAll('li'))
     .map(link => ({li: link, id: link.id, a: link.querySelector('button')}))
     .map(link => ({ ...link, day: link.a.innerText }))
     .map(x => addClickabilityDependingOnNowAndDEBUG_FLAG(x))
-    .map(x => ({...x, imgPath: 'images/' + x.day + ".jpg"}))
+    .map(x => ({...x, imgPath: imgUrlFn(x.day)}))
 
-const allClickableDoors = (doc = document) => allDoorsFUN(doc)
+const allClickableDoors = (doc = document, imgUrlFn = defaultImgPathFn) => allDoorsFUN(doc, imgUrlFn)
     .filter(x => x.clickable)
-
-const preloadAllImages = (doc = document) => allClickableDoors(doc)
-        .reverse()
-        .map(x => x.imgPath)
-        .forEach(preload);
 
 const hide = elem => {
     elem.classList.add('hidden')
@@ -151,19 +148,22 @@ main= (
 
     pubsub.sub(EVENT_CLOSE, closeOverlayFUN(loadingUrl))
 
-    allDoorsFUN().forEach(door => {
+    allDoorsFUN(document, imgUrlFn).forEach(door => {
         door.a.disabled = !door.clickable;
         if (!door.clickable) door.li.classList.add('disabled')
     })
 
-    allClickableDoors().forEach(door => {
+    allClickableDoors(document, imgUrlFn).forEach(door => {
         door.li.addEventListener('click', event => doorIsClciked(door))
         door.li.addEventListener('keydown', (ev) => {
             if ([' ','ENTER'].includes(ev.key.toUpperCase())) doorIsClciked(door)
         })
     })
 
-    preloadAllImages(document)
+    allClickableDoors(document, imgUrlFn)
+        .reverse()
+        .map(x => x.imgPath)
+        .forEach(preload)
 }
 
 const createPubSub = () => {
