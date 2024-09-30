@@ -13,3 +13,8 @@ dist/calendar.js oder dist/cal.min.js einbinden
 HTML-Code: `<main id='adventcalendar'></main>` als Platzhalter einfügen.
 
 `main()` Methode aufrufen
+
+## Entwickeln
+
+`nix-shell`
+
